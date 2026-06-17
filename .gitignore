@@ -20,6 +20,10 @@
 # production
 /build
 
+# exported interactive report
+/dist-export/
+/casa-ortiz-interactive.html
+
 # misc
 .DS_Store
 *.pem
@@ -39,3 +43,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel
