@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>Create Next App - Offline</title>
+    <style>
+      :root {
+        --background: #ffffff;
+        --foreground: #171717;
+        --page: #fafafa;
+        --card: #ffffff;
+        --muted: #52525b;
+        --border: rgba(0, 0, 0, 0.08);
+        --hover-border: transparent;
+        --secondary-hover: rgba(0, 0, 0, 0.04);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: #0a0a0a;
+          --foreground: #ededed;
+          --page: #000000;
+          --card: #000000;
+          --muted: #a1a1aa;
+          --border: rgba(255, 255, 255, 0.145);
+          --hover-border: transparent;
+          --secondary-hover: #1a1a1a;
+        }
+
+        .logo-invert {
+          filter: invert(1);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--foreground);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .page {
+        align-items: center;
+        background: var(--page);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 100vh;
+      }
+
+      .main {
+        align-items: center;
+        background: var(--card);
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        justify-content: space-between;
+        max-width: 48rem;
+        padding: 8rem 4rem;
+        width: 100%;
+      }
+
+      .copy {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+      }
+
+      h1 {
+        color: var(--foreground);
+        font-size: 1.875rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        line-height: 2.5rem;
+        margin: 0;
+        max-width: 20rem;
+      }
+
+      p {
+        color: var(--muted);
+        font-size: 1.125rem;
+        line-height: 2rem;
+        margin: 0;
+        max-width: 28rem;
+      }
+
+      .text-link {
+        color: var(--foreground);
+        font-weight: 500;
+        text-decoration: underline;
+      }
+
+      .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+      }
+
+      .button {
+        align-items: center;
+        border-radius: 9999px;
+        display: inline-flex;
+        font-size: 1rem;
+        font-weight: 500;
+        gap: 0.5rem;
+        height: 3rem;
+        justify-content: center;
+        padding: 0 1.25rem;
+        text-decoration: none;
+        transition: background-color 150ms ease, border-color 150ms ease;
+        width: 100%;
+      }
+
+      .button-primary {
+        background: var(--foreground);
+        color: var(--background);
+      }
+
+      .button-primary:hover {
+        background: #383838;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .button-primary:hover {
+          background: #cccccc;
+        }
+      }
+
+      .button-secondary {
+        border: 1px solid var(--border);
+        color: var(--foreground);
+      }
+
+      .button-secondary:hover {
+        background: var(--secondary-hover);
+        border-color: var(--hover-border);
+      }
+
+      .logo-next {
+        height: auto;
+        width: 100px;
+      }
+
+      .logo-vercel {
+        height: 16px;
+        width: 16px;
+      }
+
+      @media (min-width: 640px) {
+        .main {
+          align-items: flex-start;
+        }
+
+        .copy {
+          align-items: flex-start;
+          text-align: left;
+        }
+      }
+
+      @media (min-width: 768px) {
+        .actions {
+          flex-direction: row;
+          width: auto;
+        }
+
+        .button {
+          width: 158px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <main class="main">
+        <img class="logo-next logo-invert" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAzOTQgODAiPjxwYXRoIGZpbGw9IiMwMDAiIGQ9Ik0yNjIgMGg2OC41djEyLjdoLTI3LjJ2NjYuNmgtMTMuNlYxMi43SDI2MlYwWk0xNDkgMHYxMi43SDk0djIwLjRoNDQuM3YxMi42SDk0djIxaDU1djEyLjZIODAuNVYwaDY4Ljd6bTM0LjMgMGgtMTcuOGw2My44IDc5LjRoMTcuOWwtMzItMzkuNyAzMi0zOS42aC0xNy45bC0yMyAyOC42LTIzLTI4LjZ6bTE4LjMgNTYuNy05LTExLTI3LjEgMzMuN2gxNy44bDE4LjMtMjIuN3oiLz48cGF0aCBmaWxsPSIjMDAwIiBkPSJNODEgNzkuMyAxNyAwSDB2NzkuM2gxMy42VjE3bDUwLjIgNjIuM0g4MVptMjUyLjYtLjRjLTEgMC0xLjgtLjQtMi41LTFzLTEuMS0xLjYtMS4xLTIuNi4zLTEuOCAxLTIuNSAxLjYtMSAyLjYtMSAxLjguMyAyLjUgMWEzLjQgMy40IDAgMCAxIC42IDQuMyAzLjcgMy43IDAgMCAxLTMgMS44em0yMy4yLTMzLjVoNnYyMy4zYzAgMi4xLS40IDQtMS4zIDUuNWE5LjEgOS4xIDAgMCAxLTMuOCAzLjVjLTEuNi44LTMuNSAxLjMtNS43IDEuMy0yIDAtMy43LS40LTUuMy0xcy0yLjgtMS44LTMuNy0zLjJjLS45LTEuMy0xLjQtMy0xLjQtNWg2Yy4xLjguMyAxLjYuNyAyLjJzMSAxLjIgMS42IDEuNWMuNy40IDEuNS41IDIuNC41IDEgMCAxLjgtLjIgMi40LS42YTQgNCAwIDAgMCAxLjYtMS44Yy4zLS44LjUtMS44LjUtM1Y0NS41em0zMC45IDkuMWE0LjQgNC40IDAgMCAwLTItMy4zIDcuNSA3LjUgMCAwIDAtNC4zLTEuMWMtMS4zIDAtMi40LjItMy4zLjUtLjkuNC0xLjYgMS0yIDEuNmEzLjUgMy41IDAgMCAwLS4zIDRjLjMuNS43LjkgMS4zIDEuMmwxLjggMSAyIC41IDMuMi44YzEuMy4zIDIuNS43IDMuNyAxLjJhMTMgMTMgMCAwIDEgMy4yIDEuOCA4LjEgOC4xIDAgMCAxIDMgNi41YzAgMi0uNSAzLjctMS41IDUuMWExMCAxMCAwIDAgMS00LjQgMy41Yy0xLjguOC00LjEgMS4yLTYuOCAxLjItMi42IDAtNC45LS40LTYuOC0xLjItMi0uOC0zLjQtMi00LjUtMy41YTEwIDEwIDAgMCAxLTEuNy01LjZoNmE1IDUgMCAwIDAgMy41IDQuNmMxIC40IDIuMi42IDMuNC42IDEuMyAwIDIuNS0uMiAzLjUtLjYgMS0uNCAxLjgtMSAyLjQtMS43YTQgNCAwIDAgMCAuOC0yLjRjMC0uOS0uMi0xLjYtLjctMi4yYTExIDExIDAgMCAwLTIuMS0xLjRsLTMuMi0xLTMuOC0xYy0yLjgtLjctNS0xLjctNi42LTMuMmE3LjIgNy4yIDAgMCAxLTIuNC01LjcgOCA4IDAgMCAxIDEuNy01IDEwIDEwIDAgMCAxIDQuMy0zLjVjMi0uOCA0LTEuMiA2LjQtMS4yIDIuMyAwIDQuNC40IDYuMiAxLjIgMS44LjggMy4yIDIgNC4zIDMuNCAxIDEuNCAxLjUgMyAxLjUgNWgtNS44eiIvPjwvc3ZnPg==" alt="Next.js logo" width="100" height="20">
+
+        <div class="copy">
+          <h1>To get started, edit the page.tsx file.</h1>
+          <p>
+            Looking for a starting point or more instructions? Head over to
+            <span class="text-link">Templates</span>
+            or the
+            <span class="text-link">Learning</span>
+            center.
+          </p>
+        </div>
+
+        <div class="actions">
+          <span class="button button-primary" role="button" aria-disabled="true">
+            <img class="logo-vercel logo-invert" src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMTU1IDEwMDAiPjxwYXRoIGQ9Im01NzcuMyAwIDU3Ny40IDEwMDBIMHoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=" alt="Vercel logomark" width="16" height="16">
+            Deploy Now
+          </span>
+          <span class="button button-secondary" role="button" aria-disabled="true">
+            Documentation
+          </span>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
