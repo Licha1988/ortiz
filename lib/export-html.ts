@@ -54,7 +54,7 @@ export function generateReportHTML(
   monthlyCovers: number,
   dashboardResults: DashboardResults,
   payrollSummary: PayrollSummary,
-  suggestedTeam: StaffMember[],
+  managerTeam: StaffMember[],
 ): string {
   const { monthlyRevenue, coversMatrix, slotTotals, dayTotals } = dashboardResults;
   const today = new Date().toLocaleDateString("es-AR", {
@@ -87,7 +87,7 @@ export function generateReportHTML(
   const grandTotal = DAYS.reduce((s, d) => s + (dayTotals[d] ?? 0), 0);
 
   // ── Staff roster rows ────────────────────────────────────────────────────────
-  const rosterRows = suggestedTeam.map((m) => {
+  const rosterRows = managerTeam.map((m) => {
     const roleLabel = ROLE_CONFIG[m.roleType]?.label ?? m.roleType;
     const dayCells = m.noSchedule
       ? `<td colspan="${DAYS.length}" style="color:#a8a29e;font-style:italic;text-align:center;">sin horario fijo asignado</td>`
@@ -113,9 +113,6 @@ export function generateReportHTML(
   );
 
   function payrollRow(r: typeof payrollSummary.rows[0], dimmed = false): string {
-    const deltaSign = r.qtyDelta > 0 ? "+" : "";
-    const deltaColor =
-      r.qtyDelta > 0 ? "#dc2626" : r.qtyDelta < 0 ? "#d97706" : "#6b7280";
     return `<tr class="${dimmed ? "mgmt-row" : ""}">
       <td>${r.label}</td>
       <td class="num">${r.quantity}</td>
@@ -123,8 +120,6 @@ export function generateReportHTML(
       <td class="num">${r.hasCCSS ? fmtM(r.ccss) : "—"}</td>
       <td class="num">${fmtM(r.grossSalary)}</td>
       <td class="num bold">${fmtM(r.rowTotal)}</td>
-      <td class="num" style="color:${deltaColor}">${r.suggestedQty > 0 ? r.suggestedQty : "—"}</td>
-      <td class="num" style="color:${deltaColor}">${r.qtyDelta !== 0 ? `${deltaSign}${r.qtyDelta}` : "—"}</td>
     </tr>`;
   }
 
@@ -337,7 +332,7 @@ export function generateReportHTML(
 
   <!-- Staff roster -->
   <div class="section">
-    <div class="section-title">Plantilla sugerida — "Mi equipo"</div>
+    <div class="section-title">Plantilla del gerente — Mi equipo</div>
     <table>
       <thead>
         <tr>
@@ -355,7 +350,7 @@ export function generateReportHTML(
 
   <!-- Payroll -->
   <div class="section">
-    <div class="section-title">Nómina proyectada — Contratado vs. Sugerido</div>
+    <div class="section-title">Nómina proyectada — Plantilla del mes</div>
     <table>
       <thead>
         <tr>
@@ -364,42 +359,34 @@ export function generateReportHTML(
           <th>Salario neto</th>
           <th>CCSS</th>
           <th>Bruto/pers.</th>
-          <th>Total contratado</th>
-          <th>Sugerido</th>
-          <th>Δ</th>
+          <th>Total</th>
         </tr>
       </thead>
       <tbody>
-        <tr class="section-subhead"><td colspan="8">Gestión operativa (costo fijo — fuera del equipo)</td></tr>
+        <tr class="section-subhead"><td colspan="6">Gestión operativa (costo fijo — fuera del equipo)</td></tr>
         ${mgmtRowsHtml}
         <tr class="subtotal-row">
           <td>Subtotal gestión</td>
           <td colspan="4"></td>
           <td class="num">${fmtM(mgmtTotal)}</td>
-          <td colspan="2"></td>
         </tr>
-        <tr class="section-subhead"><td colspan="8">Equipo operativo</td></tr>
+        <tr class="section-subhead"><td colspan="6">Equipo operativo</td></tr>
         ${equipoRowsHtml}
         <tr class="subtotal-row">
           <td>Subtotal equipo</td>
           <td class="num">${payrollSummary.contractedHeadcount}</td>
           <td colspan="3"></td>
           <td class="num">${fmtM(equipoTotal)}</td>
-          <td class="num">${payrollSummary.suggestedHeadcount}</td>
-          <td class="num" style="color:${payrollSummary.headcountGap > 0 ? "#dc2626" : payrollSummary.headcountGap < 0 ? "#d97706" : "#6b7280"}">
-            ${payrollSummary.headcountGap > 0 ? "+" : ""}${payrollSummary.headcountGap !== 0 ? payrollSummary.headcountGap : "—"}
-          </td>
         </tr>
         <tr class="total-payroll">
           <td>Nómina total (equipo + gestión)</td>
           <td colspan="4"></td>
           <td class="num">${fmtM(grandTotal2)}</td>
-          <td colspan="2"></td>
         </tr>
       </tbody>
     </table>
     <p style="margin-top:12px;font-size:11px;color:#a8a29e;">
-      CCSS calculado al 34% sobre salario neto. Δ = sugerido − contratado (rojo = sub-dotación, naranja = sobre-dotación).
+      CCSS calculado al 34% sobre salario neto. Totales según plantilla cargada por el gerente.
     </p>
   </div>
 
@@ -413,9 +400,9 @@ export function downloadReport(
   monthlyCovers: number,
   dashboardResults: DashboardResults,
   payrollSummary: PayrollSummary,
-  suggestedTeam: StaffMember[],
+  managerTeam: StaffMember[],
 ): void {
-  const html = generateReportHTML(monthlyCovers, dashboardResults, payrollSummary, suggestedTeam);
+  const html = generateReportHTML(monthlyCovers, dashboardResults, payrollSummary, managerTeam);
   const blob = new Blob([html], { type: "text/html;charset=utf-8" });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement("a");

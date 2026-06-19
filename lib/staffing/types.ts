@@ -1,8 +1,10 @@
 import type { Day } from "@/lib/types";
+import type { StaffPosition } from "@/lib/staffing/positions";
 
 export type StaffRoleType =
   // ── Salón (FOH) ───────────────────────────────────────────────────────────
   | "GER"
+  | "ADMIN"
   | "ENC"
   | "CAJ_AM"
   | "CAJ_PM"
@@ -37,10 +39,12 @@ export type StaffMember = {
   id: string;
   name: string;
   roleType: StaffRoleType;
+  position?: StaffPosition;
   schedule: WeekSchedule;
   dayOff: Day | null;
   weeklyHours: number;
   noSchedule?: boolean;
+  netSalary?: number;
 };
 
 export type RequiredHeadcount = Record<StaffRoleType, number> & {

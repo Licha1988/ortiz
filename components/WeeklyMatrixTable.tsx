@@ -1,4 +1,5 @@
 import { capitalizeDay, capitalizeSlot, formatCovers, formatCurrency } from "@/lib/format";
+import { tableStyles } from "@/lib/ui/table-styles";
 import type { DashboardResults } from "@/lib/types";
 import { DAYS, TIME_SLOTS } from "@/lib/types";
 
@@ -8,20 +9,14 @@ type WeeklyMatrixTableProps = {
   mode: "covers" | "revenue";
 };
 
-const headerCell =
-  "border border-violet-300 bg-violet-100 px-3 py-2.5 text-xs font-semibold text-violet-900";
-const labelCell =
-  "border border-violet-300 bg-violet-100 px-3 py-2.5 text-left text-sm font-medium text-violet-900";
-const dataCell =
-  "border border-violet-200 bg-white px-3 py-2.5 text-center text-sm tabular-nums text-stone-900";
-const totalCell =
-  "border border-violet-300 bg-violet-100 px-3 py-2.5 text-center text-sm font-semibold tabular-nums text-violet-900";
-const dayTotalLabelCell =
-  "border border-violet-300 bg-violet-200 px-3 py-2.5 text-left text-sm font-semibold text-violet-950";
-const dayTotalCell =
-  "border border-violet-300 bg-violet-200 px-3 py-2.5 text-center text-sm font-semibold tabular-nums text-violet-950";
-const grandTotalCell =
-  "border border-violet-300 bg-violet-800 px-3 py-2.5 text-center text-sm font-bold tabular-nums text-white";
+const t = tableStyles("operational");
+const headerCell = t.header;
+const labelCell = t.label;
+const dataCell = t.data;
+const totalCell = t.total;
+const dayTotalLabelCell = t.total;
+const dayTotalCell = t.total;
+const grandTotalCell = t.grandTotal;
 
 export default function WeeklyMatrixTable({
   title,

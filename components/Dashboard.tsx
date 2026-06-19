@@ -1,21 +1,38 @@
 "use client";
 
 import { useMemo } from "react";
+import KpiCard from "@/components/ui/KpiCard";
+import PageLayout from "@/components/ui/PageLayout";
+import SectionCard from "@/components/ui/SectionCard";
+import MonthlyCalendarWeeks from "@/components/MonthlyCalendarWeeks";
+import TicketMatrixEditor from "@/components/TicketMatrixEditor";
 import { calculateDashboard, sumValues } from "@/lib/calculations";
+import { LOCAL_CAPACITY } from "@/lib/config";
 import {
   capitalizeDay,
   capitalizeSlot,
+  formatCovers,
   formatCurrency,
   formatNumber,
+  parseCurrency,
 } from "@/lib/format";
+import {
+  getOperationalMonthEntry,
+  getOperationalMonthName,
+} from "@/lib/operational-year/catalog";
+import {
+  formatCompliance,
+  objectiveComplianceTone,
+  summarizeMonthProgress,
+} from "@/lib/operational-year/compliance";
+import { useOperationalYear } from "@/lib/operational-year/OperationalYearProvider";
 import type { DashboardParams } from "@/lib/types";
 import { DAYS, TIME_SLOTS } from "@/lib/types";
-import WeeklyMatrixTable from "@/components/WeeklyMatrixTable";
-import TicketMatrixEditor from "@/components/TicketMatrixEditor";
 
 type DashboardProps = {
   params: DashboardParams;
   setParams: React.Dispatch<React.SetStateAction<DashboardParams>>;
+  embedded?: boolean;
 };
 
 function PercentageBar({ value, total }: { value: number; total: number }) {
@@ -48,30 +65,74 @@ function SumBadge({ sum, label }: { sum: number; label: string }) {
   );
 }
 
-function KpiCard({
+function ComplianceBadge({ value }: { value: number | null }) {
+  if (value == null) {
+    return (
+      <span className="rounded-full bg-black/5 px-2.5 py-0.5 text-xs font-semibold text-stone-500">
+        —
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold tabular-nums ${objectiveComplianceTone(value)}`}
+    >
+      {formatCompliance(value)}
+    </span>
+  );
+}
+
+function ProgressMetricRow({
   label,
-  value,
-  hint,
+  targetLabel,
+  targetValue,
+  actualValue,
+  compliance,
 }: {
   label: string;
-  value: string;
-  hint?: string;
+  targetLabel: string;
+  targetValue: string;
+  actualValue: string;
+  compliance: number | null;
 }) {
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-      <p className="text-sm font-medium text-stone-500">{label}</p>
-      <p className="mt-2 text-2xl font-semibold tracking-tight text-stone-900">
-        {value}
-      </p>
-      {hint && <p className="mt-1 text-xs text-stone-400">{hint}</p>}
+    <div className="rounded-xl border border-stone-100 bg-stone-50 p-4">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <p className="text-sm font-semibold text-stone-900">{label}</p>
+        <ComplianceBadge value={compliance} />
+      </div>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <div>
+          <p className="text-[11px] font-medium uppercase tracking-wide text-stone-500">
+            {targetLabel}
+          </p>
+          <p className="mt-1 text-lg font-bold tabular-nums text-stone-900">{targetValue}</p>
+        </div>
+        <div>
+          <p className="text-[11px] font-medium uppercase tracking-wide text-stone-500">
+            Real acumulado
+          </p>
+          <p className="mt-1 text-lg font-bold tabular-nums text-violet-900">{actualValue}</p>
+        </div>
+      </div>
     </div>
   );
 }
 
-const LOCAL_CAPACITY = 180;
-
-export default function Dashboard({ params, setParams }: DashboardProps) {
-  const results = useMemo(() => calculateDashboard(params), [params]);
+export default function Dashboard({ params, setParams, embedded = false }: DashboardProps) {
+  const { activeMonthKey, activeMonthActuals } = useOperationalYear();
+  const calendar = getOperationalMonthEntry(activeMonthKey);
+  const monthName = getOperationalMonthName(calendar.month);
+  const results = useMemo(
+    () =>
+      calculateDashboard(params, { year: calendar.year, month: calendar.month }),
+    [params, calendar.year, calendar.month],
+  );
+  const monthProgress = useMemo(
+    () => summarizeMonthProgress(results.calendarDays, activeMonthActuals),
+    [results.calendarDays, activeMonthActuals],
+  );
   const daySum = sumValues(params.dayPercentages);
   const slotSum = sumValues(params.slotPercentages);
 
@@ -94,8 +155,8 @@ export default function Dashboard({ params, setParams }: DashboardProps) {
     day: (typeof DAYS)[number],
     value: string,
   ) {
-    const parsed = Number(value);
-    if (!Number.isFinite(parsed) || parsed < 0) return;
+    const parsed = parseCurrency(value);
+    if (parsed === null) return;
     setParams((prev) => ({
       ...prev,
       ticketMatrix: {
@@ -126,17 +187,14 @@ export default function Dashboard({ params, setParams }: DashboardProps) {
     }));
   }
 
-  return (
-    <main className="mx-auto max-w-6xl space-y-8 px-6 py-8">
-        <section className="overflow-hidden rounded-lg border border-violet-300 bg-white shadow-sm">
-          <div className="bg-violet-800 px-4 py-3 text-sm font-semibold tracking-wide text-white">
-            Parámetro base
-          </div>
+  const body = (
+    <>
+        <SectionCard title="Parámetro base">
           <div className="px-6 py-5">
             <div className="flex flex-wrap items-end gap-6">
               <label className="block min-w-[200px] flex-1">
                 <span className="text-sm font-medium text-violet-900">
-                  Cubiertos mensuales proyectados
+                  Cubiertos proyectados (base mensual)
                 </span>
                 <input
                   type="number"
@@ -158,29 +216,80 @@ export default function Dashboard({ params, setParams }: DashboardProps) {
               </div>
             </div>
           </div>
-        </section>
+        </SectionCard>
 
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard
-            label="Cubiertos semanales"
-            value={formatNumber(results.weeklyCovers)}
-            hint="Proyección semanal equivalente"
-          />
-          <KpiCard
-            label="Facturación semanal"
-            value={formatCurrency(results.weeklyRevenue)}
-          />
-          <KpiCard
-            label="Facturación mensual"
-            value={formatCurrency(results.monthlyRevenue)}
-            hint="Según cubiertos y ticket por franja"
-          />
-          <KpiCard
-            label="Ticket promedio ponderado"
-            value={formatCurrency(results.weightedAvgTicket)}
-            hint="Promedio según cubiertos y tickets"
-          />
-        </section>
+        <SectionCard title={`Objetivos ${monthName}`}>
+          <div className="grid gap-4 p-6 sm:grid-cols-3">
+            <KpiCard
+              label="Cubiertos"
+              value={formatNumber(results.monthlyCoversTotal)}
+              hint={`Proyección de ${calendar.label}`}
+              tone="violet"
+            />
+            <KpiCard
+              label="Facturación mensual"
+              value={formatCurrency(results.monthlyRevenue)}
+              hint={`Proyección de ${calendar.label}`}
+              tone="violet"
+            />
+            <KpiCard
+              label="Ticket promedio"
+              value={formatCurrency(results.weightedAvgTicket)}
+              hint="Promedio ponderado del mes"
+              tone="violet"
+            />
+          </div>
+        </SectionCard>
+
+        <SectionCard
+          title="Cumplimiento"
+          subtitle={
+            monthProgress
+              ? `Al día ${monthProgress.progressDay} de ${monthName.toLowerCase()}`
+              : "Completá datos reales en el calendario"
+          }
+        >
+          <div className="p-6">
+            {monthProgress ? (
+              <div className="grid gap-4 lg:grid-cols-3">
+                <ProgressMetricRow
+                  label="Cubiertos"
+                  targetLabel={`Objetivo al día ${monthProgress.progressDay}`}
+                  targetValue={formatCovers(monthProgress.targetCovers)}
+                  actualValue={formatCovers(monthProgress.actualCovers)}
+                  compliance={monthProgress.coversCompliance}
+                />
+                <ProgressMetricRow
+                  label="Facturación"
+                  targetLabel={`Objetivo al día ${monthProgress.progressDay}`}
+                  targetValue={formatCurrency(monthProgress.targetRevenue)}
+                  actualValue={formatCurrency(monthProgress.actualRevenue)}
+                  compliance={monthProgress.revenueCompliance}
+                />
+                <ProgressMetricRow
+                  label="Ticket promedio"
+                  targetLabel={`Objetivo al día ${monthProgress.progressDay}`}
+                  targetValue={
+                    monthProgress.targetTicket != null
+                      ? formatCurrency(monthProgress.targetTicket)
+                      : "—"
+                  }
+                  actualValue={
+                    monthProgress.actualTicket != null
+                      ? formatCurrency(monthProgress.actualTicket)
+                      : "—"
+                  }
+                  compliance={monthProgress.ticketCompliance}
+                />
+              </div>
+            ) : (
+              <p className="text-sm text-stone-500">
+                Cargá cubiertos y facturación reales en el calendario para comparar contra el
+                objetivo acumulado del mes.
+              </p>
+            )}
+          </div>
+        </SectionCard>
 
         <div className="grid gap-8 lg:grid-cols-2">
           <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
@@ -258,7 +367,7 @@ export default function Dashboard({ params, setParams }: DashboardProps) {
                   Distribución por día
                 </h2>
                 <p className="mt-1 text-sm text-stone-500">
-                  Porcentaje de cubiertos semanales por día
+                  Porcentaje del total mensual por día de la semana
                 </p>
               </div>
               <SumBadge sum={daySum} label="Total" />
@@ -285,7 +394,8 @@ export default function Dashboard({ params, setParams }: DashboardProps) {
                   </div>
                   <div>
                     <p className="text-xs text-stone-500">
-                      {formatNumber(results.coversByDay[day])} cubiertos / sem
+                      {formatNumber(results.coversByDay[day])} cub / jornada ·{" "}
+                      {results.dayCounts[day]}× en el mes
                     </p>
                     <PercentageBar
                       value={params.dayPercentages[day]}
@@ -299,11 +409,7 @@ export default function Dashboard({ params, setParams }: DashboardProps) {
         </div>
 
         <section className="space-y-8">
-          <WeeklyMatrixTable
-            title="Cantidad por semana"
-            results={results}
-            mode="covers"
-          />
+          <MonthlyCalendarWeeks results={results} monthLabel={calendar.label} />
 
           {/* Rotation matrix */}
           <div className="overflow-hidden rounded-lg border border-slate-400 bg-white shadow-sm">
@@ -395,14 +501,6 @@ export default function Dashboard({ params, setParams }: DashboardProps) {
             </div>
           </div>
 
-          <WeeklyMatrixTable
-            title="Facturación por semana"
-            results={results}
-            mode="revenue"
-          />
-        </section>
-
-        <section>
           <TicketMatrixEditor
             ticketMatrix={params.ticketMatrix}
             ticketAverageBySlot={results.ticketAverageBySlot}
@@ -412,10 +510,10 @@ export default function Dashboard({ params, setParams }: DashboardProps) {
 
         <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-stone-900">
-            Resumen semanal por día
+            Resumen por día de la semana
           </h2>
           <p className="mt-1 text-sm text-stone-500">
-            Cubiertos y facturación estimada por jornada
+            Cubiertos y facturación por jornada y total mensual según calendario
           </p>
 
           <div className="mt-6 overflow-x-auto">
@@ -423,9 +521,10 @@ export default function Dashboard({ params, setParams }: DashboardProps) {
               <thead>
                 <tr className="border-b border-stone-200 text-xs uppercase tracking-wide text-stone-500">
                   <th className="pb-3 pr-4 font-medium">Día</th>
-                  <th className="pb-3 pr-4 font-medium">% semanal</th>
-                  <th className="pb-3 pr-4 font-medium">Cubiertos</th>
-                  <th className="pb-3 font-medium">Facturación</th>
+                  <th className="pb-3 pr-4 font-medium">% mes</th>
+                  <th className="pb-3 pr-4 font-medium">Cub / jornada</th>
+                  <th className="pb-3 pr-4 font-medium">Total mes</th>
+                  <th className="pb-3 font-medium">Fact. mes</th>
                 </tr>
               </thead>
               <tbody>
@@ -438,23 +537,37 @@ export default function Dashboard({ params, setParams }: DashboardProps) {
                       {formatNumber(params.dayPercentages[day])}%
                     </td>
                     <td className="py-3 pr-4 text-stone-600">
-                      {formatNumber(results.coversByDay[day])}
+                      {results.dayCounts[day] > 0
+                        ? formatNumber(
+                            results.weekdayMonthTotals[day].covers / results.dayCounts[day],
+                          )
+                        : "—"}
+                    </td>
+                    <td className="py-3 pr-4 text-stone-600">
+                      {formatNumber(results.weekdayMonthTotals[day].covers)}
                     </td>
                     <td className="py-3 text-stone-900">
-                      {formatCurrency(results.revenueByDay[day])}
+                      {formatCurrency(results.weekdayMonthTotals[day].revenue)}
                     </td>
                   </tr>
                 ))}
                 <tr className="bg-stone-50 font-semibold text-stone-900">
-                  <td className="py-3 pr-4">Total semanal</td>
+                  <td className="py-3 pr-4">Total mes</td>
                   <td className="py-3 pr-4">{formatNumber(daySum)}%</td>
-                  <td className="py-3 pr-4">{formatNumber(results.weeklyCovers)}</td>
-                  <td className="py-3">{formatCurrency(results.weeklyRevenue)}</td>
+                  <td className="py-3 pr-4">—</td>
+                  <td className="py-3 pr-4">{formatNumber(results.monthlyCoversTotal)}</td>
+                  <td className="py-3">{formatCurrency(results.monthlyRevenue)}</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </section>
-    </main>
+    </>
   );
+
+  if (embedded) {
+    return <div className="space-y-8 px-6 py-6">{body}</div>;
+  }
+
+  return <PageLayout width="narrow">{body}</PageLayout>;
 }

@@ -1,4 +1,15 @@
 import { DAYS, type Day } from "@/lib/types";
+import {
+  computeEventualWeeklyHours,
+  createEventualWeekSchedule,
+  EVENTUAL_INACTIVE_LABEL,
+} from "@/lib/staffing/eventual";
+import { getDefaultNetSalaryForStaffRole } from "@/lib/staffing/payroll-bridge";
+import {
+  getPositionForStaffRole,
+  getStaffRoleForPosition,
+  type StaffPosition,
+} from "@/lib/staffing/positions";
 import { ROLE_CONFIG } from "./role-config";
 import type { StaffMember, StaffRoleType, WeekSchedule } from "./types";
 
@@ -30,7 +41,6 @@ const SCHEDULE_TEMPLATES: Record<
   (index: number) => { schedule: WeekSchedule; dayOff: Day | null }
 > = {
   GER: (_index) => {
-    // Lun–Jue tarde-noche, Vie–Sáb PM, Domingo franco
     const schedule: WeekSchedule = {
       lunes:      "16:00-00:00",
       martes:     "16:00-00:00",
@@ -41,6 +51,13 @@ const SCHEDULE_TEMPLATES: Record<
       domingo:    "FRANCO",
     };
     return { schedule, dayOff: "domingo" };
+  },
+  ADMIN: (index) => {
+    const dayOff = balancedDayOff(index, 2);
+    return {
+      schedule: buildSchedule(dayOff, "09:00-17:00", "09:00-13:00"),
+      dayOff,
+    };
   },
   ENC: (_index) => {
     // Presente fines de semana (alta demanda), franco el martes
@@ -130,17 +147,10 @@ const SCHEDULE_TEMPLATES: Record<
     );
     return { schedule, dayOff };
   },
-  CE: (index) => {
-    // Eventual: no fixed day off — available all 7 days
-    const schedule = DAYS.reduce(
-      (acc, day) => {
-        acc[day] = index % 2 === 0 ? "09:00-17:00" : "17:00-00:00";
-        return acc;
-      },
-      {} as WeekSchedule,
-    );
-    return { schedule, dayOff: null };
-  },
+  CE: (_index) => ({
+    schedule: createEventualWeekSchedule(),
+    dayOff: null,
+  }),
   BC: (index) => {
     // Even → AM barista, odd → PM barista.
     // 1st AM (0): abre desde las 9 — desayuno + almuerzo.
@@ -287,14 +297,56 @@ export function createStaffMember(
 ): StaffMember {
   const { schedule, dayOff } = SCHEDULE_TEMPLATES[roleType](index);
   staffIdCounter += 1;
+  const position = getPositionForStaffRole(roleType);
   return {
     id: `staff-${roleType}-${index}-${staffIdCounter}`,
     name,
     roleType,
+    position,
     schedule,
     dayOff,
-    weeklyHours: computeWeeklyHours(schedule),
+    weeklyHours:
+      position === "eventual"
+        ? computeEventualWeeklyHours(schedule)
+        : computeWeeklyHours(schedule),
+    netSalary: getDefaultNetSalaryForStaffRole(roleType),
     ...(roleType === "LIS" && { noSchedule: true }),
+  };
+}
+
+export function createStaffMemberForPosition(
+  position: StaffPosition,
+  shift: "am" | "pm",
+  index: number,
+  name = "",
+): StaffMember {
+  const roleType = getStaffRoleForPosition(position, shift);
+  return {
+    ...createStaffMember(roleType, index, name),
+    position,
+  };
+}
+
+export function replaceMemberPosition(
+  member: StaffMember,
+  position: StaffPosition,
+): StaffMember {
+  const shift = getMemberShiftGroup(member);
+  const roleType = getStaffRoleForPosition(position, shift);
+  const indexMatch = member.id.match(/-(\d+)-/);
+  const index = indexMatch ? Number(indexMatch[1]) : 0;
+  const { schedule, dayOff } = SCHEDULE_TEMPLATES[roleType](index);
+  return {
+    ...member,
+    roleType,
+    position,
+    schedule,
+    dayOff,
+    weeklyHours:
+      position === "eventual"
+        ? computeEventualWeeklyHours(schedule)
+        : computeWeeklyHours(schedule),
+    noSchedule: position === "socio_operativo",
   };
 }
 
@@ -303,7 +355,59 @@ export function withUpdatedSchedule(
   day: Day,
   value: string,
 ): StaffMember {
+  const position = member.position ?? getPositionForStaffRole(member.roleType);
+
+  if (position === "eventual") {
+    const trimmed = value.trim();
+    const next =
+      trimmed === "" || trimmed.toUpperCase() === EVENTUAL_INACTIVE_LABEL
+        ? EVENTUAL_INACTIVE_LABEL
+        : trimmed.toUpperCase();
+    const schedule = { ...member.schedule, [day]: next };
+    return {
+      ...member,
+      schedule,
+      dayOff: null,
+      weeklyHours: computeEventualWeeklyHours(schedule),
+    };
+  }
+
   const schedule = { ...member.schedule, [day]: value.toUpperCase() || "FRANCO" };
+  return {
+    ...member,
+    schedule,
+    dayOff: detectDayOff(schedule),
+    weeklyHours: computeWeeklyHours(schedule),
+  };
+}
+
+function defaultHoursForDay(member: StaffMember, day: Day): string {
+  const isWeekend = WEEKEND.includes(day);
+  for (const otherDay of DAYS) {
+    if (otherDay === day) continue;
+    const value = member.schedule[otherDay];
+    if (value === "FRANCO") continue;
+    if (WEEKEND.includes(otherDay) === isWeekend) return value;
+  }
+  return isWeekend ? "09:00-17:00" : "09:00-17:00";
+}
+
+export function moveFrancoDay(
+  member: StaffMember,
+  fromDay: Day,
+  toDay: Day,
+): StaffMember {
+  if (fromDay === toDay || member.schedule[fromDay] !== "FRANCO") {
+    return member;
+  }
+
+  const targetValue = member.schedule[toDay];
+  const schedule = {
+    ...member.schedule,
+    [toDay]: "FRANCO",
+    [fromDay]: targetValue === "FRANCO" ? defaultHoursForDay(member, fromDay) : targetValue,
+  };
+
   return {
     ...member,
     schedule,
@@ -336,7 +440,7 @@ export function getMemberShiftGroup(member: StaffMember): "am" | "pm" {
 export type StaffDisplayGroup = "fixed" | "am" | "pm";
 
 export function getMemberDisplayGroup(member: StaffMember): StaffDisplayGroup {
-  if (["LIS", "BRUNO", "GER"].includes(member.roleType)) return "fixed";
+  if (["LIS", "BRUNO", "GER", "ADMIN"].includes(member.roleType)) return "fixed";
   if (member.roleType === "ENC" || member.roleType === "CR") return "am";
   return getMemberShiftGroup(member);
 }
@@ -353,7 +457,7 @@ export function getMemberRoleLabel(member: StaffMember): string {
 }
 
 const DISPLAY_ORDER = [
-  "LIS", "BRUNO", "GER",
+  "LIS", "BRUNO", "GER", "ADMIN",
   "ENC", "CAJ_AM", "JFS_AM", "CAM:am", "CE:am", "BC:am", "CR", "PAR_AM", "JEFE_COC_AM", "FUE_AM",
   "CAJ_PM", "JFS_PM", "REC_PM", "CAM:pm", "CE:pm", "BC:pm", "JEFE_COC_PM",
   "PAR_PM", "FUE_PM", "GUAR_PM", "FREI_PM", "BACH_PM",

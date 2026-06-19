@@ -10,9 +10,8 @@ type AppHeaderProps = {
 };
 
 const VIEWS: { id: AppView; label: string }[] = [
-  { id: "operational", label: "Gestión operativa" },
-  { id: "staffing", label: "Recurso humano" },
-  { id: "payroll", label: "Payroll" },
+  { id: "operational", label: "Gesti?n operativa" },
+  { id: "cashflow", label: "Cashflow" },
 ];
 
 export default function AppHeader({ activeView, onViewChange, onExport }: AppHeaderProps) {
@@ -25,18 +24,12 @@ export default function AppHeader({ activeView, onViewChange, onExport }: AppHea
               Casa Ortiz
             </p>
             <h1 className="mt-1 font-serif text-3xl font-semibold text-stone-900 sm:text-4xl">
-              {activeView === "operational"
-                ? "Gestión operativa"
-                : activeView === "staffing"
-                  ? "Cálculo de recurso humano"
-                  : "Payroll"}
+              {activeView === "operational" ? "Gesti?n operativa" : "Cashflow"}
             </h1>
             <p className="mt-2 max-w-xl text-sm text-stone-600">
               {activeView === "operational"
-                ? "Proyectá cubiertos y facturación a partir de tus parámetros operativos."
-                : activeView === "staffing"
-                  ? "Dotación sugerida según cubiertos y comparación con la plantilla del gerente."
-                  : "Proyectá el peso de la nómina sobre la facturación mensual. Editá sueldos y cantidades."}
+                ? "Facturaci?n, cubiertos, payroll y recurso humano en secciones desplegables."
+                : "Proyect? EERR y flujo de caja con cubiertos, ticket y n?mina editables mes a mes."}
             </p>
           </div>
 

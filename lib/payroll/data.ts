@@ -1,6 +1,7 @@
 import type { PayrollEntry, RefuerzoEntry } from "./types";
+import { CCSS_RATE } from "@/lib/config";
 
-export const CCSS_RATE = 0.34;
+export { CCSS_RATE };
 
 export const PAYROLL_CATEGORY_ORDER = ["direccion", "foh", "boh"] as const;
 
@@ -30,7 +31,7 @@ export const DEFAULT_PAYROLL_ENTRIES: PayrollEntry[] = [
   },
   {
     roleId: "CHEF_EJ",
-    label: "Bruno Bonnao (chef ejecutivo)",
+    label: "Bruno Bonnano (chef ejecutivo)",
     category: "boh",
     dependency: "fijo",
     isEssential: true,
@@ -44,7 +45,7 @@ export const DEFAULT_PAYROLL_ENTRIES: PayrollEntry[] = [
   // ── Dirección y administración ──────────────────────────────────────────────
   {
     roleId: "ADMIN",
-    label: "Administrativo",
+    label: "Administración",
     category: "direccion",
     dependency: "fijo",
     isEssential: false,
@@ -52,6 +53,7 @@ export const DEFAULT_PAYROLL_ENTRIES: PayrollEntry[] = [
     quantity: 1,
     netSalary: 2_300_000,
     elasticity: "baja",
+    notes: "Administración y back office.",
   },
   // ── Salón (FOH) ─────────────────────────────────────────────────────────────
   {
@@ -127,7 +129,7 @@ export const DEFAULT_PAYROLL_ENTRIES: PayrollEntry[] = [
   },
   {
     roleId: "RUNNER_COMIS",
-    label: "Runner / Comis",
+    label: "Commis",
     category: "foh",
     dependency: "demanda",
     isEssential: false,
@@ -136,7 +138,19 @@ export const DEFAULT_PAYROLL_ENTRIES: PayrollEntry[] = [
     netSalary: 550_000,
     kitchenCoversThreshold: 1200,
     elasticity: "alta",
-    notes: "Soporte de sala. Puede ser eventual.",
+    notes: "Soporte de sala — runner / commis.",
+  },
+  {
+    roleId: "EVENTUAL",
+    label: "Eventual",
+    category: "foh",
+    dependency: "demanda",
+    isEssential: false,
+    hasCCSS: true,
+    quantity: 0,
+    netSalary: 60_000,
+    elasticity: "alta",
+    notes: "Refuerzo eventual: $60.000 por jornada de 6 horas.",
   },
   {
     roleId: "BARRA_BARISTA",

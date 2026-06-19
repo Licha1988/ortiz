@@ -1,3 +1,5 @@
+import type { StaffPosition } from "@/lib/staffing/positions";
+
 export type PayrollCategory = "direccion" | "foh" | "boh";
 export type PayrollDependency = "fijo" | "demanda";
 
@@ -12,6 +14,7 @@ export type PayrollRoleId =
   | "CAMARERO_AM"
   | "CAMARERO_PM"
   | "RUNNER_COMIS"
+  | "EVENTUAL"
   | "BARRA_BARISTA"
   | "JEFE_COCINA"
   | "PROD_AM"
@@ -22,10 +25,13 @@ export type PayrollRoleId =
 export type PayrollEntry = {
   roleId: PayrollRoleId;
   label: string;
+  position?: StaffPosition;
   category: PayrollCategory;
   dependency: PayrollDependency;
   isEssential: boolean;
   hasCCSS: boolean;
+  /** Tasa CCSS por puesto (0–1). Default: 34% si hasCCSS, 0 si no. */
+  ccssRate?: number;
   isManagement?: boolean; // true = Lisandro o Bruno → sección separada
   quantity: number;
   netSalary: number;
@@ -49,10 +55,6 @@ export type PayrollRowComputed = PayrollEntry & {
   ccss: number;
   grossSalary: number;
   rowTotal: number;
-  suggestedQty: number;
-  suggestedRowTotal: number; // suggestedQty × grossSalary
-  qtyDelta: number;          // suggestedQty − quantity  (+ = need more, − = over-hired)
-  costDelta: number;         // suggestedRowTotal − rowTotal
 };
 
 export type PayrollSummary = {
@@ -66,17 +68,18 @@ export type PayrollSummary = {
   direccionSubtotal: number;
   // Separación gestión operativa (Lisandro + Bruno) vs equipo
   managementSubtotal: number;
+  /** Nómina mensual del equipo fijo (sin gestión ni eventuales de plantilla). */
+  nominaOperativaSubtotal: number;
+  /** Contratación diaria de eventuales del mes. */
+  eventualesSubtotal: number;
+  /** Nómina operativa + eventuales diarios. */
   equipoSubtotal: number;
   managementToRevenuePercent: number;
+  nominaOperativaToRevenuePercent: number;
+  eventualesToRevenuePercent: number;
   equipoToRevenuePercent: number;
   // Indicadores
   payrollToRevenuePercent: number;
   rows: PayrollRowComputed[];
-  // Contracted vs suggested comparison
-  suggestedPayroll: number;
-  suggestedHeadcount: number;
   contractedHeadcount: number;
-  payrollGap: number;
-  headcountGap: number;
-  suggestedToRevenuePercent: number;
 };

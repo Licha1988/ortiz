@@ -31,9 +31,31 @@ export type DashboardParams = {
 
 export type CoversMatrix = Record<TimeSlot, Record<Day, number>>;
 export type RevenueMatrix = Record<TimeSlot, Record<Day, number>>;
+export type DayCounts = Record<Day, number>;
+
+export type OperationalCalendar = {
+  year: number;
+  /** Mes calendario 1–12 (enero = 1). */
+  month: number;
+};
+
+export type CalendarDayProjection = {
+  date: number;
+  weekday: Day;
+  covers: number;
+  revenue: number;
+};
+
+export type WeekdayMonthTotals = Record<Day, { covers: number; revenue: number }>;
 
 export type DashboardResults = {
+  calendar: OperationalCalendar;
+  dayCounts: DayCounts;
+  daysInMonth: number;
+  calendarDays: CalendarDayProjection[];
+  weekdayMonthTotals: WeekdayMonthTotals;
   weeklyCovers: number;
+  monthlyCoversTotal: number;
   monthlyRevenue: number;
   weeklyRevenue: number;
   weightedAvgTicket: number;

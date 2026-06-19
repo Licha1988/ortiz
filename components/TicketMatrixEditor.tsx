@@ -1,4 +1,5 @@
-import { capitalizeDay, capitalizeSlot, formatCurrency } from "@/lib/format";
+import { capitalizeDay, capitalizeSlot, formatCurrency, parseCurrency } from "@/lib/format";
+import { tableInputCell, tableInputInner, tableStyles } from "@/lib/ui/table-styles";
 import type { DashboardParams, DashboardResults } from "@/lib/types";
 import { DAYS, TIME_SLOTS } from "@/lib/types";
 
@@ -12,14 +13,10 @@ type TicketMatrixEditorProps = {
   ) => void;
 };
 
-const headerCell =
-  "border border-violet-300 bg-violet-100 px-3 py-2.5 text-xs font-semibold text-violet-900";
-const labelCell =
-  "border border-violet-300 bg-violet-100 px-3 py-2.5 text-left text-sm font-medium text-violet-900";
-const avgCell =
-  "border border-violet-300 bg-violet-100 px-3 py-2.5 text-center text-sm font-semibold tabular-nums text-violet-900";
-const inputCell =
-  "w-full min-w-[5.5rem] border-0 bg-amber-50 px-2 py-2 text-center text-sm tabular-nums text-stone-900 outline-none focus:bg-amber-100 focus:ring-2 focus:ring-violet-400/40 focus:ring-inset";
+const t = tableStyles("violet");
+const headerCell = t.header;
+const labelCell = t.label;
+const avgCell = t.total;
 
 export default function TicketMatrixEditor({
   ticketMatrix,
@@ -52,15 +49,15 @@ export default function TicketMatrixEditor({
                 {DAYS.map((day) => (
                   <td
                     key={day}
-                    className="border border-violet-200 bg-amber-50 p-0"
+                    className={tableInputCell}
                   >
                     <input
-                      type="number"
-                      min={0}
-                      step={500}
-                      value={ticketMatrix[slot][day]}
+                      type="text"
+                      inputMode="numeric"
+                      value={formatCurrency(ticketMatrix[slot][day])}
+                      onFocus={(e) => e.target.select()}
                       onChange={(e) => onUpdate(slot, day, e.target.value)}
-                      className={inputCell}
+                      className={tableInputInner}
                       aria-label={`Ticket ${capitalizeSlot(slot)} ${capitalizeDay(day)}`}
                     />
                   </td>

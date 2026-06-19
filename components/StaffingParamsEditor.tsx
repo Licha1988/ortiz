@@ -2,7 +2,7 @@
 
 import { Fragment } from "react";
 import {
-  STAFFING_PARAM_ROWS,
+  GENERAL_STAFFING_PARAM_ROWS,
   type StaffingParamKey,
   type StaffingParams,
 } from "@/lib/staffing/params";
@@ -13,11 +13,7 @@ type StaffingParamsEditorProps = {
 };
 
 const SECTION_COLORS: Record<string, { header: string; stripe: string }> = {
-  "Salón AM (9:00 – 17:00)":   { header: "bg-sky-800 border-sky-600",    stripe: "bg-sky-50/30" },
-  "Salón PM (17:00 – Cierre)": { header: "bg-indigo-800 border-indigo-600", stripe: "bg-indigo-50/30" },
-  "Cocina AM (9:00 – 17:00)":  { header: "bg-slate-700 border-slate-500", stripe: "bg-slate-50/40" },
-  "Cocina PM (17:00 – Cierre)":{ header: "bg-slate-800 border-slate-600", stripe: "bg-slate-50/40" },
-  "Criterios generales":       { header: "bg-violet-800 border-violet-600", stripe: "" },
+  "Criterios generales": { header: "bg-violet-800 border-violet-600", stripe: "" },
 };
 
 const hCell =
@@ -29,7 +25,26 @@ export default function StaffingParamsEditor({
   params,
   onChange,
 }: StaffingParamsEditorProps) {
-  let currentSection: string | undefined;
+  const rowsWithSections = GENERAL_STAFFING_PARAM_ROWS.reduce<
+    {
+      row: (typeof GENERAL_STAFFING_PARAM_ROWS)[number];
+      idx: number;
+      section: string | undefined;
+      showSection: boolean;
+    }[]
+  >((acc, row, idx) => {
+    const previousSection = acc.at(-1)?.section;
+    const section = row.section ?? previousSection;
+    return [
+      ...acc,
+      {
+        row,
+        idx,
+        section,
+        showSection: Boolean(row.section && row.section !== previousSection),
+      },
+    ];
+  }, []);
 
   return (
     <section className="overflow-hidden rounded-lg border border-violet-300 bg-white shadow-sm">
@@ -48,11 +63,9 @@ export default function StaffingParamsEditor({
             </tr>
           </thead>
           <tbody>
-            {STAFFING_PARAM_ROWS.map((row, idx) => {
-              const showSection = row.section && row.section !== currentSection;
-              if (row.section) currentSection = row.section;
-              const sectionColors = currentSection
-                ? (SECTION_COLORS[currentSection] ?? { header: "bg-slate-700", stripe: "" })
+            {rowsWithSections.map(({ row, idx, section, showSection }) => {
+              const sectionColors = section
+                ? (SECTION_COLORS[section] ?? { header: "bg-slate-700", stripe: "" })
                 : { header: "bg-slate-700", stripe: "" };
 
               return (

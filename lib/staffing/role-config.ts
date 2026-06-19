@@ -2,7 +2,7 @@ import type { StaffRoleType } from "./types";
 
 export const STAFF_ROLE_ORDER: StaffRoleType[] = [
   // Fijos independientes de turno
-  "LIS", "BRUNO", "GER",
+  "LIS", "BRUNO", "GER", "ADMIN",
   // Turno AM
   "ENC", "CAJ_AM", "JFS_AM", "CAM", "CE", "BC", "CR",
   "PAR_AM", "JEFE_COC_AM", "FUE_AM",
@@ -12,7 +12,7 @@ export const STAFF_ROLE_ORDER: StaffRoleType[] = [
 ];
 
 export const FIXED_STAFF_ROLES: StaffRoleType[] = [
-  "LIS", "BRUNO", "GER", "ENC", "PAR_AM", "JEFE_COC_AM",
+  "LIS", "BRUNO", "GER", "ADMIN", "ENC", "PAR_AM", "JEFE_COC_AM",
 ];
 
 export const DEMAND_STAFF_ROLES: StaffRoleType[] = [
@@ -40,6 +40,15 @@ export const ROLE_CONFIG: Record<StaffRoleType, RoleConfig> = {
     groupLabel: "Gerente (GER)",
     dependency: "independiente",
     maturityReason: "Rol estratégico: existe desde la apertura",
+    maturityTrigger: "No depende de capacidad",
+    group: "foh",
+  },
+  ADMIN: {
+    label: "Administración",
+    shiftCode: "A",
+    groupLabel: "Administración (ADMIN)",
+    dependency: "independiente",
+    maturityReason: "Back office y administración del local",
     maturityTrigger: "No depende de capacidad",
     group: "foh",
   },

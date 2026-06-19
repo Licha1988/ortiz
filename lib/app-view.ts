@@ -1,1 +1,1 @@
-export type AppView = "operational" | "staffing" | "payroll";
+export type AppView = "operational" | "cashflow";

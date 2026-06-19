@@ -155,6 +155,10 @@ export const STAFFING_PARAM_ROWS: StaffingParamMeta[] = [
   { type: "input",  key: "eventualThresholdPercent", label: "Umbral eventual (%)",           unit: "% sobre dotación", description: "Si la demanda pico supera este porcentaje, se activa el commis / eventual",  step: 1,   min: 0 },
 ];
 
+export const GENERAL_STAFFING_PARAM_ROWS = STAFFING_PARAM_ROWS.filter(
+  (row) => row.section === "Criterios generales",
+);
+
 export function shiftsPerPersonWeek(params: StaffingParams): number {
   const workingDays = Math.max(1, 7 - params.weeklyDayOff);
   const avgShiftHours = (params.minHoursPerShift + params.maxHoursPerShift) / 2;
