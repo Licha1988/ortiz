@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import OperationalHub from "@/components/OperationalHub";
 import CashflowDashboard from "@/components/CashflowDashboard";
@@ -15,7 +16,9 @@ import {
 } from "@/lib/operational-year/OperationalYearProvider";
 import { computeHrOperationalSummary } from "@/lib/staffing/hr-summary";
 
-function CasaOrtizAppContent() {
+function CasaOrtizAppContent({ username }: { username?: string }) {
+  const router = useRouter();
+  const [loggingOut, setLoggingOut] = useState(false);
   const [activeView, setActiveView] = useState<AppView>("operational");
   const {
     activeMonthParams,
@@ -72,6 +75,17 @@ function CasaOrtizAppContent() {
     activeMonthManagerTeam,
   ]);
 
+  const handleLogout = useCallback(async () => {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.replace("/login");
+      router.refresh();
+    } finally {
+      setLoggingOut(false);
+    }
+  }, [router]);
+
   const content = useMemo(() => {
     if (activeView === "cashflow") {
       return (
@@ -110,16 +124,23 @@ function CasaOrtizAppContent() {
 
   return (
     <div className="min-h-full bg-stone-100">
-      <AppHeader activeView={activeView} onViewChange={setActiveView} onExport={handleExport} />
+      <AppHeader
+        activeView={activeView}
+        onViewChange={setActiveView}
+        onExport={handleExport}
+        username={username}
+        onLogout={username ? handleLogout : undefined}
+        loggingOut={loggingOut}
+      />
       {content}
     </div>
   );
 }
 
-export default function CasaOrtizApp() {
+export default function CasaOrtizApp({ username }: { username?: string }) {
   return (
     <OperationalYearProvider>
-      <CasaOrtizAppContent />
+      <CasaOrtizAppContent username={username} />
     </OperationalYearProvider>
   );
 }

@@ -44,3 +44,21 @@ Documentación para agentes y diseño: `AGENTS.md`, `DESIGN_SYSTEM.md`, `.cursor
 ## Stack
 
 Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · Vite (export standalone)
+
+## Acceso con usuario y contraseña
+
+La app exige login. Los usuarios se configuran por variables de entorno (ideal para 2–3 cuentas en Vercel).
+
+1. Generá credenciales:
+
+```bash
+node scripts/generate-auth-users.mjs lisandro:tu-clave bruno:tu-clave gerente:tu-clave
+```
+
+2. Copiá `AUTH_SECRET` y `AUTH_USERS` a:
+   - `.env.local` para desarrollo local
+   - **Vercel → Project → Settings → Environment Variables** para producción
+
+3. Redeploy en Vercel después de guardar las variables.
+
+La sesión dura 14 días (cookie httpOnly). Desde el header podés ver el usuario activo y cerrar sesión.
