@@ -18,6 +18,7 @@ import {
   parseCurrency,
   parseNumber,
 } from "@/lib/format";
+import CashflowExcelView from "@/components/CashflowExcelView";
 import { useOperationalYear } from "@/lib/operational-year/OperationalYearProvider";
 
 type CashflowDashboardProps = {
@@ -214,6 +215,8 @@ export default function CashflowDashboard({
 
   return (
     <PageLayout className="space-y-6">
+      <CashflowExcelView />
+
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           label="Ventas año 1"
@@ -273,8 +276,8 @@ export default function CashflowDashboard({
       </section>
 
       <SectionCard
-        title="Estado de resultados mensual — Año 1"
-        subtitle="Cubiertos, ticket, ventas y nóminas vienen del hub operativo (Facturación + RRHH) por mes. Editá esos datos en la pestaña Operativa."
+        title="Estado de resultados — Hub operativo"
+        subtitle="Modelo calculado en la app. Cubiertos, ticket, ventas y nóminas vienen de Facturación + RRHH por mes."
         tone="cashflow"
         className="rounded-2xl"
       >

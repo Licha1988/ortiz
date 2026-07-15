@@ -135,13 +135,13 @@ export const STAFFING_PARAM_ROWS: StaffingParamMeta[] = [
   { type: "input",  key: "barEventualRatio",    label: "Refuerzo barra",     unit: "cub pico rush / barista",  description: "Cubiertos en pico extremo (rush) para activar barista de refuerzo (AM o PM)",                          step: 5,   min: 1 },
 
   // ── Cocina AM (9:00 – 17:00) ──────────────────────────────────────────────
-  { type: "fixed",  section: "Cocina AM (9:00 – 17:00)", label: "Responsable de producción AM", unit: "—", description: "Rol fijo de apertura y producción AM — independiente de capacidad" },
+  { type: "fixed",  section: "Cocina AM (9:00 – 17:00)", label: "Jefe de pastelería AM", unit: "—", description: "Rol fijo de apertura y pastelería AM — independiente de capacidad" },
   { type: "fixed",  label: "Jefe de cocina AM", unit: "—", description: "Rol fijo de liderazgo AM — independiente de capacidad" },
   { type: "input",  key: "ayudanteAmRatio", label: "Cocinero AM", unit: "cub pico rush / cocinero", description: "Escala con cubiertos AM: 1 cocinero cada este ratio de cubiertos en hora pico (rush)", step: 5, min: 5 },
 
   // ── Cocina PM (17:00 – Cierre) ────────────────────────────────────────────
   { type: "input",  section: "Cocina PM (17:00 – Cierre)", key: "jefeCocinaPmThreshold", label: "Jefe de cocina PM",     unit: "cub pico rush PM",  description: "Cubiertos en hora pico (rush) PM para activar jefe de cocina vespertino",                              step: 5,  min: 0 },
-  { type: "input",  key: "ayudantePmRatio",               label: "Ayudantes cocina PM por estación", unit: "cub pico rush / estación", description: "Escala con cubiertos PM: activa Parrilla, Fuegos, Guarniciones y Freidora según demanda del rush", step: 5,  min: 5 },
+  { type: "input",  key: "ayudantePmRatio",               label: "Ayudantes cocina PM por estación", unit: "cub pico rush / estación", description: "Escala con cubiertos PM: activa Pastelería, Fuegos, Guarniciones y Freidora según demanda del rush", step: 5,  min: 5 },
   { type: "input",  key: "bachaPmRatio",                  label: "Bacha PM",              unit: "cub pico rush / bacha", description: "Cubiertos en hora pico (rush) PM por persona de bacha",                                             step: 5,  min: 10 },
 
   // ── Criterios generales ───────────────────────────────────────────────────

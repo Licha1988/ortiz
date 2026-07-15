@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -44,17 +45,24 @@ const OperationalYearContext = createContext<OperationalYearContextValue | null>
 
 export function OperationalYearProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<OperationalYearState>(createDefaultOperationalYearState);
+  /**
+   * Evita que el primer render (con valores por defecto) se guarde en
+   * localStorage antes de que termine de leerse lo que ya estaba guardado.
+   * Sin esto, un remount rápido (p. ej. Fast Refresh en desarrollo) puede
+   * pisar datos guardados con los valores por defecto.
+   */
+  const hasHydratedRef = useRef(false);
 
   useEffect(() => {
     const stored = readOperationalYearFromStorage();
     if (stored) {
-      window.setTimeout(() => {
-        setState(mergeOperationalYearState(stored));
-      }, 0);
+      setState(mergeOperationalYearState(stored));
     }
+    hasHydratedRef.current = true;
   }, []);
 
   useEffect(() => {
+    if (!hasHydratedRef.current) return;
     window.localStorage.setItem(OPERATIONAL_YEAR_STORAGE_KEY, JSON.stringify(state));
   }, [state]);
 

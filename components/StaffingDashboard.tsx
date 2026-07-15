@@ -4,7 +4,6 @@ import { useMemo, useRef } from "react";
 import EventualDailyHiringTable from "@/components/EventualDailyHiringTable";
 import HrOperationalKpis from "@/components/HrOperationalKpis";
 import MaturityMatrix from "@/components/MaturityMatrix";
-import PositionCoverageTable from "@/components/PositionCoverageTable";
 import StaffingParamsEditor from "@/components/StaffingParamsEditor";
 import RushWindowsTable from "@/components/RushWindowsTable";
 import StaffRosterTable from "@/components/StaffRosterTable";
@@ -13,24 +12,16 @@ import { calculateDashboard } from "@/lib/calculations";
 import { getOperationalMonthEntry } from "@/lib/operational-year/catalog";
 import { useOperationalYear } from "@/lib/operational-year/OperationalYearProvider";
 import type { PayrollEntry } from "@/lib/payroll/types";
-import { setPositionEmploymentType } from "@/lib/staffing/position-payroll";
 import { resolveMemberPosition } from "@/lib/staffing/payroll-bridge";
 import {
   getStaffingMaturity,
 } from "@/lib/staffing/calculations";
 import { computeHrOperationalSummary } from "@/lib/staffing/hr-summary";
-import {
-  getPeakDayCovers,
-  listPositionCoverageProfiles,
-  updatePositionCoverageEmploymentType,
-  updatePositionCoverageRatio,
-} from "@/lib/staffing/position-coverage";
 import type { StaffingParamKey, StaffingParams } from "@/lib/staffing/params";
 import {
   STAFF_POSITION_OPTIONS,
   positionNeedsShift,
   positionUsesIndexShiftParity,
-  type StaffEmploymentType,
   type StaffPosition,
 } from "@/lib/staffing/positions";
 import {
@@ -70,8 +61,6 @@ export default function StaffingDashboard({
 }: StaffingDashboardProps) {
   const {
     activeMonthKey,
-    activeMonthPositionCoverage,
-    setActiveMonthPositionCoverage,
     activeMonthEventualDailyHiring,
     setActiveMonthEventualDailyHiring,
   } = useOperationalYear();
@@ -83,13 +72,6 @@ export default function StaffingDashboard({
     () =>
       calculateDashboard(params, { year: calendar.year, month: calendar.month }),
     [params, calendar.year, calendar.month],
-  );
-
-  const peakDayCovers = useMemo(() => getPeakDayCovers(results), [results]);
-
-  const coverageProfiles = useMemo(
-    () => listPositionCoverageProfiles(activeMonthPositionCoverage),
-    [activeMonthPositionCoverage],
   );
 
   const maturity = useMemo(
@@ -192,21 +174,6 @@ export default function StaffingDashboard({
     setStaffingParams((prev) => ({ ...prev, [key]: parsed }));
   }
 
-  function updateCoverageEmploymentType(position: StaffPosition, value: StaffEmploymentType) {
-    setActiveMonthPositionCoverage((prev) =>
-      updatePositionCoverageEmploymentType(prev, position, value),
-    );
-    setPayrollEntries((prev) => setPositionEmploymentType(prev, position, value));
-  }
-
-  function updateCoverageRatio(position: StaffPosition, value: string) {
-    const parsed = Number(value);
-    if (!Number.isFinite(parsed) || parsed <= 0) return;
-    setActiveMonthPositionCoverage((prev) =>
-      updatePositionCoverageRatio(prev, position, parsed),
-    );
-  }
-
   const body = (
     <div className="space-y-8">
       <HrOperationalKpis
@@ -217,13 +184,6 @@ export default function StaffingDashboard({
       />
 
       <StaffingParamsEditor params={staffingParams} onChange={updateStaffingParam} />
-
-      <PositionCoverageTable
-        peakDayCovers={peakDayCovers}
-        profiles={coverageProfiles}
-        onEmploymentTypeChange={updateCoverageEmploymentType}
-        onCoverageRatioChange={updateCoverageRatio}
-      />
 
       <MaturityMatrix
         monthlyCovers={params.monthlyCovers}

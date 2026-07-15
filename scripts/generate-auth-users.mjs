@@ -34,7 +34,13 @@ for (const pair of pairs) {
 }
 
 const authSecret = randomBytes(32).toString("hex");
+const usersJson = JSON.stringify(users);
+const usersJsonForLocal = usersJson.replace(/\$/g, "\\$");
 
 console.log("# Copiá estas variables a .env.local (dev) o al panel de Vercel (prod)\n");
 console.log(`AUTH_SECRET=${authSecret}`);
-console.log(`AUTH_USERS=${JSON.stringify(users)}`);
+console.log(
+  "# .env.local: escapá cada $ del hash (dotenv local rompe bcrypt sin esto):",
+);
+console.log(`AUTH_USERS=${usersJsonForLocal}`);
+console.log(`# Vercel (JSON sin escapar): AUTH_USERS=${usersJson}`);

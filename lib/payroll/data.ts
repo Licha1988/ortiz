@@ -179,7 +179,7 @@ export const DEFAULT_PAYROLL_ENTRIES: PayrollEntry[] = [
   },
   {
     roleId: "PROD_AM",
-    label: "Producción AM (cocina fría / mise en place)",
+    label: "Jefe de pastelería AM",
     category: "boh",
     dependency: "fijo",
     isEssential: true,

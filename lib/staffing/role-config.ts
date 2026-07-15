@@ -181,11 +181,11 @@ export const ROLE_CONFIG: Record<StaffRoleType, RoleConfig> = {
   },
   // ── BOH AM ────────────────────────────────────────────────────────────────
   PAR_AM: {
-    label: "Responsable de producción AM",
+    label: "Jefe de pastelería AM",
     shiftCode: "PROD",
-    groupLabel: "Responsable de producción AM",
+    groupLabel: "Jefe de pastelería AM",
     dependency: "independiente",
-    maturityReason: "Producción y preparación AM: rol fijo de apertura",
+    maturityReason: "Pastelería y preparación AM: rol fijo de apertura",
     maturityTrigger: "No depende de capacidad",
     group: "boh",
   },
@@ -227,11 +227,11 @@ export const ROLE_CONFIG: Record<StaffRoleType, RoleConfig> = {
   },
   // ── BOH PM ────────────────────────────────────────────────────────────────
   PAR_PM: {
-    label: "Ayudante cocina PM — Parrilla",
+    label: "Ayudante de pastelería PM",
     shiftCode: "PAR",
-    groupLabel: "Ayudante cocina PM — Parrilla",
+    groupLabel: "Ayudante de pastelería PM",
     dependency: "dependiente",
-    maturityReason: "Estación de parrilla para servicio PM",
+    maturityReason: "Estación de pastelería para servicio PM",
     maturityTrigger: "Escala con cubiertos PM",
     group: "boh",
   },

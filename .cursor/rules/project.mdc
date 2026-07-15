@@ -1,0 +1,44 @@
+---
+description: Convenciones de arquitectura y estilo de Casa Ortiz
+alwaysApply: true
+---
+
+# Reglas del proyecto Casa Ortiz
+
+## Estructura
+
+- Lógica de negocio en `lib/` (pura, sin JSX, sin `"use client"`).
+- UI en `components/`; primitivas reutilizables en `components/ui/`.
+- Imports con alias `@/*`.
+- Tokens de diseño en `lib/ui/tokens.ts`; constantes de dominio en `lib/config.ts`.
+
+## React
+
+- Derivar datos con `useMemo` sobre funciones puras de `lib/`. NUNCA con `setState` en `useEffect`.
+- Estado global en `CasaOrtizApp`, baja por props.
+
+## UI / estilo
+
+Seguir **Design consistency rules** en `DESIGN_SYSTEM.md`:
+
+- Reutilizar `components/ui/` antes de crear componentes.
+- No inventar tokens visuales sin actualizar el design system.
+- Toda pantalla: `AppHeader` + `PageLayout`.
+- Acción primaria arriba a la derecha; destructivo con confirmación.
+- Empty state: título + descripción + acción.
+- Tablas: `table-styles.ts`; forms: label → helper → input → error.
+- Input editable → `bg-amber-50` (focus `bg-amber-100` + ring violeta).
+- Cifras con `tabular-nums`; moneda vía `lib/format.ts`.
+
+## Dominio
+
+- Costo de gestión = Lisandro + Bruno (`MANAGEMENT_ROLE_IDS`).
+- Francos: domingo–miércoles, nunca viernes/sábado.
+- Chef ejecutivo: "Bruno Bonnano" (grafía única).
+
+## Build
+
+- Windows + PowerShell: encadenar con `;`, no `&&`.
+- Validar con `npm run build` y `npm run lint`.
+- No commitear `dist-export/` ni `casa-ortiz-interactive.html`.
+- Commits/push solo a pedido explícito del usuario.

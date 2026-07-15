@@ -17,8 +17,8 @@ export const STAFF_POSITION_OPTIONS = [
   { id: "cocinero", label: "Cocinero" },
   { id: "ayudante_cocina", label: "Ayudante de cocina" },
   { id: "bachero", label: "Bachero" },
-  { id: "produccion", label: "Producción" },
-  { id: "ayudante_produccion", label: "Ayudante de producción" },
+  { id: "produccion", label: "Jefe de pastelería" },
+  { id: "ayudante_produccion", label: "Ayudante de pastelería" },
 ] as const;
 
 export type StaffPosition = (typeof STAFF_POSITION_OPTIONS)[number]["id"];

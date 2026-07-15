@@ -21,10 +21,10 @@ export function createDefaultManagerTeam(): StaffMember[] {
     { role: "JEFE_COC_AM",  count: 1, names: ["Jefe Cocina AM"] },
     { role: "JEFE_COC_PM",  count: 1, names: ["Jefe Cocina PM"] },
     // BOH AM
-    { role: "PAR_AM",  count: 1, names: ["Responsable producción AM"] },
+    { role: "PAR_AM",  count: 1, names: ["Jefe de pastelería AM"] },
     { role: "FUE_AM",  count: 1, names: ["Cocinero AM"] },
     // BOH PM
-    { role: "PAR_PM",  count: 1, names: ["Ayudante PM Parrilla"] },
+    { role: "PAR_PM",  count: 1, names: ["Ayudante PM Pastelería"] },
     { role: "FUE_PM",  count: 1, names: ["Ayudante PM Fuegos"] },
     { role: "GUAR_PM", count: 1, names: ["Ayudante PM Guarniciones"] },
     { role: "FREI_PM", count: 1, names: ["Ayudante PM Freidora"] },
