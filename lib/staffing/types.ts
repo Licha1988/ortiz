@@ -10,6 +10,7 @@ export type StaffRoleType =
   | "CAJ_PM"
   | "JFS_AM"
   | "JFS_PM"
+  | "REC_AM"
   | "REC_PM"
   | "CAM"
   | "CR"

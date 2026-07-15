@@ -4,7 +4,7 @@ export const STAFF_ROLE_ORDER: StaffRoleType[] = [
   // Fijos independientes de turno
   "LIS", "BRUNO", "GER", "ADMIN",
   // Turno AM
-  "ENC", "CAJ_AM", "JFS_AM", "CAM", "CE", "BC", "CR",
+  "ENC", "CAJ_AM", "JFS_AM", "REC_AM", "CAM", "CE", "BC", "CR",
   "PAR_AM", "JEFE_COC_AM", "FUE_AM",
   // Turno PM
   "CAJ_PM", "JFS_PM", "REC_PM", "JEFE_COC_PM",
@@ -16,7 +16,7 @@ export const FIXED_STAFF_ROLES: StaffRoleType[] = [
 ];
 
 export const DEMAND_STAFF_ROLES: StaffRoleType[] = [
-  "CAJ_AM", "JFS_AM", "CAM", "CE", "BC",
+  "CAJ_AM", "JFS_AM", "REC_AM", "CAM", "CE", "BC",
   "FUE_AM", "CAJ_PM", "JFS_PM", "REC_PM", "JEFE_COC_PM",
   "PAR_PM", "FUE_PM", "GUAR_PM", "FREI_PM", "BACH_PM",
   "CR",
@@ -95,6 +95,15 @@ export const ROLE_CONFIG: Record<StaffRoleType, RoleConfig> = {
     dependency: "dependiente",
     maturityReason: "La demanda vespertina supera la capacidad combinada",
     maturityTrigger: "Depende de cubiertos PM",
+    group: "foh",
+  },
+  REC_AM: {
+    label: "Recepcionista AM",
+    shiftCode: "RA",
+    groupLabel: "Recepcionista AM (REC)",
+    dependency: "dependiente",
+    maturityReason: "La demanda matutina requiere recepción dedicada",
+    maturityTrigger: "Depende de cubiertos AM",
     group: "foh",
   },
   REC_PM: {

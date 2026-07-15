@@ -100,6 +100,13 @@ const SCHEDULE_TEMPLATES: Record<
       dayOff,
     };
   },
+  REC_AM: (index) => {
+    const dayOff = balancedDayOff(index);
+    return {
+      schedule: buildSchedule(dayOff, "09:00-17:00", "09:00-17:00"),
+      dayOff,
+    };
+  },
   REC_PM: (index) => {
     const dayOff = balancedDayOff(index, 1);
     return {
@@ -458,7 +465,7 @@ export function getMemberRoleLabel(member: StaffMember): string {
 
 const DISPLAY_ORDER = [
   "LIS", "BRUNO", "GER", "ADMIN",
-  "ENC", "CAJ_AM", "JFS_AM", "CAM:am", "CE:am", "BC:am", "CR", "PAR_AM", "JEFE_COC_AM", "FUE_AM",
+  "ENC", "CAJ_AM", "JFS_AM", "REC_AM", "CAM:am", "CE:am", "BC:am", "CR", "PAR_AM", "JEFE_COC_AM", "FUE_AM",
   "CAJ_PM", "JFS_PM", "REC_PM", "CAM:pm", "CE:pm", "BC:pm", "JEFE_COC_PM",
   "PAR_PM", "FUE_PM", "GUAR_PM", "FREI_PM", "BACH_PM",
 ] as const;
