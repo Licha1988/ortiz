@@ -104,6 +104,18 @@ export const DEFAULT_PAYROLL_ENTRIES: PayrollEntry[] = [
     notes: "Se activa cuando la demanda de salón lo requiere.",
   },
   {
+    roleId: "RECEPCIONISTA",
+    label: "Recepcionista",
+    category: "foh",
+    dependency: "demanda",
+    isEssential: false,
+    hasCCSS: true,
+    quantity: 1,
+    netSalary: 700_000,
+    elasticity: "media",
+    notes: "Recepción dedicada en el turno de mayor demanda.",
+  },
+  {
     roleId: "CAMARERO_AM",
     label: "Camareros AM",
     category: "foh",

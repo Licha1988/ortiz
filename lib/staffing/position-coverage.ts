@@ -27,6 +27,7 @@ const DEFAULTS_BY_POSITION: Record<StaffPosition, PositionCoverageEntry> = {
   encargado: { employmentType: "independiente", coverageRatio: null },
   cajero: { employmentType: "dependiente", coverageRatio: 160 },
   jefe_salon: { employmentType: "dependiente", coverageRatio: 135 },
+  recepcionista: { employmentType: "dependiente", coverageRatio: 135 },
   camarero: { employmentType: "dependiente", coverageRatio: 30 },
   commis: { employmentType: "dependiente", coverageRatio: 30 },
   eventual: { employmentType: "dependiente", coverageRatio: 25 },

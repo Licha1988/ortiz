@@ -26,6 +26,7 @@ const POSITION_PAYROLL_ROLE: Record<StaffPosition, PayrollRoleId> = {
   encargado: "ENC_TURNO",
   cajero: "CAJERO",
   jefe_salon: "JEFE_SALON",
+  recepcionista: "RECEPCIONISTA",
   camarero: "CAMARERO_AM",
   commis: "RUNNER_COMIS",
   eventual: "EVENTUAL",

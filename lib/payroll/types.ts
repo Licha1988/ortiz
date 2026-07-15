@@ -11,6 +11,7 @@ export type PayrollRoleId =
   | "ENC_TURNO"
   | "CAJERO"
   | "JEFE_SALON"
+  | "RECEPCIONISTA"
   | "CAMARERO_AM"
   | "CAMARERO_PM"
   | "RUNNER_COMIS"

@@ -9,6 +9,7 @@ export const STAFF_POSITION_OPTIONS = [
   { id: "encargado", label: "Encargado" },
   { id: "cajero", label: "Cajero" },
   { id: "jefe_salon", label: "Jefe de salón" },
+  { id: "recepcionista", label: "Recepcionista" },
   { id: "camarero", label: "Camarero" },
   { id: "commis", label: "Commis" },
   { id: "eventual", label: "Eventual" },
@@ -42,6 +43,7 @@ const PAYROLL_ROLE_TO_POSITION: Record<PayrollRoleId, StaffPosition> = {
   ENC_TURNO: "encargado",
   CAJERO: "cajero",
   JEFE_SALON: "jefe_salon",
+  RECEPCIONISTA: "recepcionista",
   CAMARERO_AM: "camarero",
   CAMARERO_PM: "camarero",
   RUNNER_COMIS: "commis",
@@ -64,7 +66,7 @@ const STAFF_ROLE_TO_POSITION: Partial<Record<StaffRoleType, StaffPosition>> = {
   CAJ_PM: "cajero",
   JFS_AM: "jefe_salon",
   JFS_PM: "jefe_salon",
-  REC_PM: "jefe_salon",
+  REC_PM: "recepcionista",
   CAM: "camarero",
   CE: "eventual",
   BC: "barra_cafe",
@@ -97,6 +99,7 @@ const POSITIONS_WITHOUT_SHIFT = new Set<StaffPosition>([
   "gerente",
   "administracion",
   "encargado",
+  "recepcionista",
   "commis",
   "eventual",
   "produccion",
@@ -137,6 +140,8 @@ export function getStaffRoleForPosition(
       return shift === "am" ? "CAJ_AM" : "CAJ_PM";
     case "jefe_salon":
       return shift === "am" ? "JFS_AM" : "JFS_PM";
+    case "recepcionista":
+      return "REC_PM";
     case "camarero":
       return "CAM";
     case "commis":

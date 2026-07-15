@@ -29,7 +29,7 @@ const STAFF_TO_PAYROLL: Partial<Record<StaffRoleType, PayrollRoleId>> = {
   CAJ_PM: "CAJERO",
   JFS_AM: "JEFE_SALON",
   JFS_PM: "JEFE_SALON",
-  REC_PM: "JEFE_SALON",
+  REC_PM: "RECEPCIONISTA",
   CAM: "CAMARERO_AM",
   CR: "RUNNER_COMIS",
   CE: "EVENTUAL",
